@@ -151,11 +151,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\HalfMesh\HalfMesh.h" />
+    <ClCompile Include="..\src\LoopSubdivision.cpp" />
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\HalfMesh\HalfMesh.cpp" />
-    <ClCompile Include="test.cpp" />
+    <ClInclude Include="..\src\LoopSubdivision.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
