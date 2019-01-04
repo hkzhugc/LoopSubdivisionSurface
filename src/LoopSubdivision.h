@@ -34,3 +34,5 @@ typedef OpenMesh::DefaultTraits::Point Point;
 typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits>  MyTriMesh;
 
 void LoopSubDividision(MyTriMesh& mesh);
+void BuildCube(MyTriMesh& mesh);
+void BuildPlane(MyTriMesh& mesh);

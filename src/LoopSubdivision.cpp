@@ -51,6 +51,7 @@ void LoopSubDividision(MyTriMesh& mesh)
 	}
 
 	//for each old vertex, cal it's new pos
+	int bound_cnt = 0;
 	for (auto it = mesh.vertices_begin(); it != mesh.vertices_end(); ++it)
 	{
 		mesh.data(*it).set_isNew(false);
@@ -74,18 +75,35 @@ void LoopSubDividision(MyTriMesh& mesh)
 		}
 		else
 		{
+			bound_cnt++;
 			Point sum(0, 0, 0);
 			int cnt = 0;
-			for (auto vvit = mesh.vv_iter(*it); vvit.is_valid(); ++vvit)
+			for (auto veit = mesh.ve_iter(*it); veit.is_valid(); ++veit)
 			{
-				if (mesh.is_boundary(*vvit))
+				if (mesh.is_boundary(*veit))
 				{
-					sum += mesh.point(*vvit);
+					auto he = mesh.halfedge_handle(veit, 0);
+					OpenMesh::VertexHandle v;
+					if (mesh.from_vertex_handle(he) == it)
+					{
+						v = mesh.to_vertex_handle(he);
+					}
+					else if (mesh.to_vertex_handle(he) == it)
+					{
+						v = mesh.from_vertex_handle(he);
+					}
+					else
+					{
+						std::cerr << "wrong mesh ???" << std::endl;
+						return;
+					}
+					sum += mesh.point(v);
 					cnt++;
 				}
+					
 			}
 			assert(cnt == 2);
-			newPosition = 3.0 / 4.0 * mesh.point(*it) + 1.0 / 4 * sum;
+			newPosition = 3.0 / 4.0 * mesh.point(*it) + 1.0 / 8.0 * sum;
 		}
 		mesh.data(*it).set_newPosition(newPosition);
 	}
@@ -120,7 +138,7 @@ void LoopSubDividision(MyTriMesh& mesh)
 			mesh.data(new_e2).set_isNew(false);
 		}
 	}
-
+	std::cout << "there are " << bound_cnt << " bounds vertice" << std::endl;
 	//2nd flip the edge
 	int cnt_ = 0;
 	for (auto it = mesh.edges_begin(); it != mesh.edges_end(); ++it)
@@ -147,4 +165,120 @@ void LoopSubDividision(MyTriMesh& mesh)
 			mesh.set_point(it, mesh.data(*it).newPosition());
 	}
 	std::cout << "there are " << mesh.n_edges() << " edges after split" << std::endl;
+}
+
+void BuildCube(MyTriMesh & mesh)
+{
+	MyTriMesh::VertexHandle vhandle[8];
+
+	vhandle[0] = mesh.add_vertex(MyTriMesh::Point(-1, -1, 1));
+	vhandle[1] = mesh.add_vertex(MyTriMesh::Point(1, -1, 1));
+	vhandle[2] = mesh.add_vertex(MyTriMesh::Point(1, 1, 1));
+	vhandle[3] = mesh.add_vertex(MyTriMesh::Point(-1, 1, 1));
+	vhandle[4] = mesh.add_vertex(MyTriMesh::Point(-1, -1, -1));
+	vhandle[5] = mesh.add_vertex(MyTriMesh::Point(1, -1, -1));
+	vhandle[6] = mesh.add_vertex(MyTriMesh::Point(1, 1, -1));
+	vhandle[7] = mesh.add_vertex(MyTriMesh::Point(-1, 1, -1));
+
+	std::vector<MyTriMesh::VertexHandle>  face_vhandles;
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[0]);
+	face_vhandles.push_back(vhandle[1]);
+	face_vhandles.push_back(vhandle[2]);
+	face_vhandles.push_back(vhandle[3]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[7]);
+	face_vhandles.push_back(vhandle[6]);
+	face_vhandles.push_back(vhandle[5]);
+	face_vhandles.push_back(vhandle[4]);
+	mesh.add_face(face_vhandles);
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[1]);
+	face_vhandles.push_back(vhandle[0]);
+	face_vhandles.push_back(vhandle[4]);
+	face_vhandles.push_back(vhandle[5]);
+	mesh.add_face(face_vhandles);
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[2]);
+	face_vhandles.push_back(vhandle[1]);
+	face_vhandles.push_back(vhandle[5]);
+	face_vhandles.push_back(vhandle[6]);
+	mesh.add_face(face_vhandles);
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[3]);
+	face_vhandles.push_back(vhandle[2]);
+	face_vhandles.push_back(vhandle[6]);
+	face_vhandles.push_back(vhandle[7]);
+	mesh.add_face(face_vhandles);
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[0]);
+	face_vhandles.push_back(vhandle[3]);
+	face_vhandles.push_back(vhandle[7]);
+	face_vhandles.push_back(vhandle[4]);
+	mesh.add_face(face_vhandles);
+}
+
+void BuildPlane(MyTriMesh & mesh)
+{
+	MyTriMesh::VertexHandle vhandle[9];
+	vhandle[0] = mesh.add_vertex(MyTriMesh::Point(-1, -1, 0));
+	vhandle[1] = mesh.add_vertex(MyTriMesh::Point(0, -1, 0));
+	vhandle[2] = mesh.add_vertex(MyTriMesh::Point(1, -1, 0));
+	vhandle[3] = mesh.add_vertex(MyTriMesh::Point(-1, 0, 0));
+	vhandle[4] = mesh.add_vertex(MyTriMesh::Point(0, 0, 0));
+	vhandle[5] = mesh.add_vertex(MyTriMesh::Point(1, 0, 0));
+	vhandle[6] = mesh.add_vertex(MyTriMesh::Point(-1, 1, 0));
+	vhandle[7] = mesh.add_vertex(MyTriMesh::Point(0, 1, 0));
+	vhandle[8] = mesh.add_vertex(MyTriMesh::Point(1, 1, 0));
+
+	std::vector<MyTriMesh::VertexHandle>  face_vhandles;
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[0]);
+	face_vhandles.push_back(vhandle[1]);
+	face_vhandles.push_back(vhandle[3]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[1]);
+	face_vhandles.push_back(vhandle[4]);
+	face_vhandles.push_back(vhandle[3]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[1]);
+	face_vhandles.push_back(vhandle[2]);
+	face_vhandles.push_back(vhandle[4]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[2]);
+	face_vhandles.push_back(vhandle[5]);
+	face_vhandles.push_back(vhandle[4]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[3]);
+	face_vhandles.push_back(vhandle[4]);
+	face_vhandles.push_back(vhandle[6]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[4]);
+	face_vhandles.push_back(vhandle[7]);
+	face_vhandles.push_back(vhandle[6]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[4]);
+	face_vhandles.push_back(vhandle[5]);
+	face_vhandles.push_back(vhandle[7]);
+	mesh.add_face(face_vhandles);
+
+	face_vhandles.clear();
+	face_vhandles.push_back(vhandle[5]);
+	face_vhandles.push_back(vhandle[8]);
+	face_vhandles.push_back(vhandle[7]);
+	mesh.add_face(face_vhandles);
 }
