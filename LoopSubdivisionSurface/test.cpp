@@ -19,7 +19,10 @@ int main(int argc, char* argv[])
 	MyTriMesh mesh;
 	if (argc < 4)
 	{
-		std::cerr << "command is too short\n--cube <subdivision times> <output_name> for default cube\n--file <subdivision times> <input_name> <output_name> for customize input" << std::endl;
+		std::cerr << "command is too short\n"
+			<< "--cube <subdivision times> <output_name> for default cube\n" 
+			<< "--plane <subdivision times> <output_name> for default plane\n" 
+			<< "--file <subdivision times> <input_name> <output_name> for customize input\n" << std::endl;
 		return 1;
 	}
 	sub_times = atoi(argv[2]);
@@ -55,7 +58,10 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cerr << "unkown command\n--cube <subdivision times> <output_name> for default cube\n--file <subdivision times> <input_name> <output_name> for customize input" << std::endl;
+		std::cerr << "unknown command\n"
+			<< "--cube <subdivision times> <output_name> for default cube\n"
+			<< "--plane <subdivision times> <output_name> for default plane\n"
+			<< "--file <subdivision times> <input_name> <output_name> for customize input\n" << std::endl;
 		return 1;
 	}
 	

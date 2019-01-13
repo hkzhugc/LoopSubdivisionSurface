@@ -138,7 +138,7 @@ void LoopSubDividision(MyTriMesh& mesh)
 			mesh.data(new_e2).set_isNew(false);
 		}
 	}
-	std::cout << "there are " << bound_cnt << " bounds vertice" << std::endl;
+	//std::cout << "there are " << bound_cnt << " bounds vertice" << std::endl;
 	//2nd flip the edge
 	int cnt_ = 0;
 	for (auto it = mesh.edges_begin(); it != mesh.edges_end(); ++it)
